@@ -5,17 +5,14 @@ import {
   ValidateCompany,
   ValidateExisitingCompany,
 } from "../models/companies.js";
-// const { auth } = require("../middleware/auth");
-// const { admin } = require("../middleware/admin");
+
 const route = express.Router();
 
 route.get("/details_by_id", async (req, res) => {
-  // const id = req.params.id;
   const id = req.query.id;
 
   try {
     const result = await Companies.find({ _id: id });
-    // res.status(200);
     res.status(200).send(result);
     console.log("Result", result);
   } catch (err) {
@@ -28,8 +25,6 @@ route.post("/new_company", async (req, res) => {
   if (error) {
     return res.status(400).send(error);
   }
-  console.log("sdsdsds", req?.body, error);
-
   try {
     const companyData = lodash.pick(req.body, [
       "company_name",

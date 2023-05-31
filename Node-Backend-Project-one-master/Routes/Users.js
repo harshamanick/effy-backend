@@ -1,13 +1,7 @@
 import express from "express";
-// const lodash = require("lodash");
 import lodash from "lodash";
-// const bcrypt = require("bcrypt");
 import { User, ValidateUser, validateExsistingUser } from "../models/Users.js";
 export const route = express.Router();
-// const config = require("config");
-// const jwt = require("jsonwebtoken");
-// const hashing = require("../Hasing/hash");
-// const { auth } = require("../middleware/auth");
 
 route.get("/get_user_details_by_id/:id", async (req, res) => {
   const id = req.params.id;
