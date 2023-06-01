@@ -5,6 +5,7 @@ import {
   ValidateCompany,
   ValidateExisitingCompany,
 } from "../models/companies.js";
+import { User } from "../models/Users.js";
 
 const route = express.Router();
 
@@ -52,6 +53,7 @@ route.delete("/delete_company", async (req, res) => {
   const companyId = req?.query?.id;
   try {
     const result = await Companies.findByIdAndRemove(companyId);
+    const deleteUsers = await User.deleteMany({ company_id: companyId });
     const response = await Companies.find({});
     if (!result) {
       return res.status(404).send("User not found");
