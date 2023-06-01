@@ -19,6 +19,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  position: {
+    type: Array,
+    required: true,
+  }
 });
 export const ValidateCompany = (data) => {
   const schema = Joi.object({
@@ -26,6 +30,7 @@ export const ValidateCompany = (data) => {
     company_address_1: Joi.string().required(),
     company_address_2: Joi.string().required(),
     pincode: Joi.string().required(),
+    position: Joi.array().required(),
   });
 
   return schema.validate(data);
@@ -37,6 +42,7 @@ export const ValidateExisitingCompany = (data) => {
     company_address_2: Joi.string().required(),
     pincode: Joi.string().required(),
     _id: Joi.string().required(),
+    position: Joi.array().required(),
   });
 
   return schema.validate(data);

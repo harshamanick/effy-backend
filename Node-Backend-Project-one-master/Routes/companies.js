@@ -6,6 +6,7 @@ import {
   ValidateExisitingCompany,
 } from "../models/companies.js";
 import { User } from "../models/Users.js";
+import { getPosition } from "../location/geocodeLocation.js";
 
 const route = express.Router();
 
@@ -15,17 +16,12 @@ route.get("/details_by_id", async (req, res) => {
   try {
     const result = await Companies.find({ _id: id });
     res.status(200).send(result);
-    console.log("Result", result);
   } catch (err) {
     console.log("ERROR", err);
     res.send(500, err);
   }
 });
 route.post("/new_company", async (req, res) => {
-  const { error } = ValidateCompany(req?.body);
-  if (error) {
-    return res.status(400).send(error);
-  }
   try {
     const companyData = lodash.pick(req.body, [
       "company_name",
@@ -33,11 +29,12 @@ route.post("/new_company", async (req, res) => {
       "company_address_2",
       "pincode",
     ]);
-    const isExistingCompany = await Companies.findOne({
-      company_name: companyData.company_name,
-    });
-    if (isExistingCompany) {
-      return res.status(400).send("Company Name alreay exist");
+    const location = `${companyData?.company_address_1} ${companyData?.company_address_2} ${companyData?.pincode}`;
+    const postion = await getPosition(location);
+    companyData.position = [postion?.latitude, postion?.longitude];
+    const { error } = ValidateCompany(companyData);
+    if (error) {
+      return res.status(400).send(error);
     }
 
     const company = new Companies(companyData);
@@ -65,20 +62,23 @@ route.delete("/delete_company", async (req, res) => {
   }
 });
 route.put("/update_company", async (req, res) => {
-  const { error } = ValidateExisitingCompany(req.body);
+  let companyData = req?.body;
+  const location = `${companyData?.company_address_1} ${companyData?.company_address_2} ${companyData?.pincode}`;
+  const postion = await getPosition(location);
+  companyData.position = [postion?.latitude, postion?.longitude];
+  const { error } = ValidateExisitingCompany(companyData);
   if (error) {
     return res.status(400).send(error);
   }
 
   try {
-    const isCompaniesExist = await Companies.findOne({ _id: req?.body?._id });
+    const isCompaniesExist = await Companies.findOne({ _id: companyData._id });
     if (!isCompaniesExist) {
       return res.status(404).send("Companies not found");
     }
-
     const updatedCompany = await Companies.findOneAndUpdate(
-      { _id: req?.body?._id },
-      req.body,
+      { _id: companyData?._id },
+      companyData,
       { new: true }
     );
     res.send(updatedCompany);

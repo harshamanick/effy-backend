@@ -21,6 +21,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.9.2",
     "node-geocoder": "^4.2.0",
+    "opencage-api-client": "^1.0.1",
     "pug": "^3.0.2"
   }
 }
