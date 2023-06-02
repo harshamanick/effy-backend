@@ -71,6 +71,7 @@ route.put("/update_user", async (req, res) => {
   const { error } = validateExsistingUser(req.body);
   const companyId = req?.body?.company_id;
   const requestBody = req?.body;
+
   if (error) {
     return res.status(400).send(error);
   }
@@ -80,15 +81,27 @@ route.put("/update_user", async (req, res) => {
     if (!isUserExist) {
       return res.status(404).send("User not found");
     }
+
+    const isExistingEmail = await User.findOne({
+      email: req?.body?.email,
+      _id: { $ne: req?.body?._id } // Exclude the current user from the query
+    });
+
+    if (isExistingEmail) {
+      return res.status(400).send("Email already used by another user");
+    }
+
     if (req?.body?.migrate_id) {
       req.body.company_id = req.body.migrate_id;
       delete req.body.migrate_id;
     }
+
     const updatedUser = await User.findOneAndUpdate(
       { _id: requestBody._id },
       requestBody,
       { new: true }
     );
+
     const response = await User.find({ company_id: companyId });
     res.send(response);
   } catch (error) {
@@ -96,7 +109,6 @@ route.put("/update_user", async (req, res) => {
     res.status(500).send("An error occurred");
   }
 });
-
 route.get("/get_all_users_by_id", async (req, res) => {
   const company_id = req.query.id;
 
