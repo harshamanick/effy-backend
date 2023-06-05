@@ -1,6 +1,6 @@
 import express from "express";
 import lodash from "lodash";
-import { User, ValidateUser, validateExsistingUser } from "../models/Users.js";
+import { User, ValidateUser, validateExistingUser } from "../models/Users.js";
 export const route = express.Router();
 
 route.get("/get_user_details_by_id/:id", async (req, res) => {
@@ -68,7 +68,7 @@ route.delete("/delete_user", async (req, res) => {
 });
 
 route.put("/update_user", async (req, res) => {
-  const { error } = validateExsistingUser(req.body);
+  const { error } = validateExistingUser(req.body);
   const companyId = req?.body?.company_id;
   const requestBody = req?.body;
 

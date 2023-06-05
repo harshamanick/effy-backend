@@ -30,7 +30,7 @@ export const ValidateUser = (data) => {
 
   return schema.validate(data);
 };
-export const validateExsistingUser = (data) => {
+export const validateExistingUser = (data) => {
   const schema = Joi.object({
     first_name: Joi.string().required(),
     last_name: Joi.string().required(),

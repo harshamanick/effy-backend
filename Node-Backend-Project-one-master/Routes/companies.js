@@ -3,14 +3,14 @@ import lodash from "lodash";
 import {
   Companies,
   ValidateCompany,
-  ValidateExisitingCompany,
+  ValidateExistingCompany,
 } from "../models/companies.js";
 import { User } from "../models/Users.js";
 import { getPosition } from "../location/geocodeLocation.js";
 
 const route = express.Router();
 
-route.get("/details_by_id", async (req, res) => {
+route.get("/get_company_details_by_id", async (req, res) => {
   const id = req.query.id;
 
   try {
@@ -30,8 +30,8 @@ route.post("/new_company", async (req, res) => {
       "pincode",
     ]);
     const location = `${companyData?.company_address_1} ${companyData?.company_address_2} ${companyData?.pincode}`;
-    const postion = await getPosition(location);
-    companyData.position = [postion?.latitude, postion?.longitude];
+    const position = await getPosition(location);
+    companyData.position = [position?.latitude, position?.longitude];
     const { error } = ValidateCompany(companyData);
     if (error) {
       return res.status(400).send(error);
@@ -40,13 +40,13 @@ route.post("/new_company", async (req, res) => {
     const company = new Companies(companyData);
     const result = await company.save();
     const response = await Companies.find({});
-    res.status(200).send(response);
+    res.status(201).send(response);
   } catch (error) {
     console.log(error);
     res.status(500).send("An error occurred");
   }
 });
-route.delete("/delete_company", async (req, res) => {
+route.delete("/delete_company_by_id", async (req, res) => {
   const companyId = req?.query?.id;
   try {
     const result = await Companies.findByIdAndRemove(companyId);
@@ -61,12 +61,12 @@ route.delete("/delete_company", async (req, res) => {
     res.status(500).send("An error occurred");
   }
 });
-route.put("/update_company", async (req, res) => {
+route.put("/update_company_by_id", async (req, res) => {
   let companyData = req?.body;
   const location = `${companyData?.company_address_1} ${companyData?.company_address_2} ${companyData?.pincode}`;
-  const postion = await getPosition(location);
-  companyData.position = [postion?.latitude, postion?.longitude];
-  const { error } = ValidateExisitingCompany(companyData);
+  const position = await getPosition(location);
+  companyData.position = [position?.latitude, position?.longitude];
+  const { error } = ValidateExistingCompany(companyData);
   if (error) {
     return res.status(400).send(error);
   }
@@ -81,7 +81,7 @@ route.put("/update_company", async (req, res) => {
       companyData,
       { new: true }
     );
-    res.send(updatedCompany);
+    res.status(200).send(updatedCompany);
   } catch (error) {
     console.log(error);
     res.status(500).send("An error occurred");

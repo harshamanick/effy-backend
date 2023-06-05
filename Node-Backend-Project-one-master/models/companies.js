@@ -35,7 +35,7 @@ export const ValidateCompany = (data) => {
 
   return schema.validate(data);
 };
-export const ValidateExisitingCompany = (data) => {
+export const ValidateExistingCompany = (data) => {
   const schema = Joi.object({
     company_name: Joi.string().required(),
     company_address_1: Joi.string().required(),
